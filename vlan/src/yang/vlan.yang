@@ -2,33 +2,65 @@ module vlan {
   namespace "http://com/example/vlan";
   prefix vlan;
 
-  import ietf-inet-types {
-    prefix inet;
-  }
   import tailf-ncs {
     prefix ncs;
   }
 
-  list vlan {
-    key name;
+  import tailf-common {
+    prefix tailf;
+  }
 
-    uses ncs:service-data;
-    ncs:servicepoint "vlan";
+  augment /ncs:services{
+    
+    list vlan {
+      tailf:info "Service for creating a VLAN";
+      key name;
+      unique vlan-id;
 
-    leaf name {
-      type string;
-    }
+      uses ncs:service-data;
+      ncs:servicepoint "vlan";
 
-    // may replace this with other ways of refering to the devices.
-    leaf-list device {
-      type leafref {
-        path "/ncs:devices/ncs:device/ncs:name";
+      leaf name {
+        tailf:info "VLAN name";
+        type string;
       }
-    }
 
-    // replace with your own stuff here
-    leaf dummy {
-      type inet:ipv4-address;
+      leaf vlan-id {
+        tailf:info "VLAN ID";
+        type uint32 {
+          range "1..4096";
+        }
+      }
+
+      list device {
+        tailf:info "Device and interface";
+        key name;
+
+        leaf name {
+          tailf:info "Device name";        
+          type leafref {
+            path "/ncs:devices/ncs:device/ncs:name";
+          }
+        }
+
+        list interface {
+          tailf:info "Interface type and ID";
+          key "intf-type intf-id";
+
+          leaf intf-type {
+            tailf:info "Interface type";
+            type enumeration {
+              enum Ethernet;
+              enum FastEthernet;
+              enum GigabitEthernet;
+            }
+          }
+          leaf intf-id {
+            tailf:info "Interface ID";
+            type string;
+          }
+        }
+      }
     }
   }
 }
