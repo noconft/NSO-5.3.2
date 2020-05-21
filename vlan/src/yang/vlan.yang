@@ -10,10 +10,10 @@ module vlan {
     prefix tailf;
   }
 
-  augment /ncs:services{
+  augment /ncs:services {
     
     list vlan {
-      tailf:info "Service for creating a VLAN";
+      tailf:info "VLAN Service";
       key name;
       unique vlan-id;
 
@@ -21,19 +21,19 @@ module vlan {
       ncs:servicepoint "vlan";
 
       leaf name {
-        tailf:info "VLAN name";
+        tailf:info "Service Instance Name";
         type string;
       }
 
       leaf vlan-id {
-        tailf:info "VLAN ID";
+        tailf:info "Unique VLAN ID";
         type uint32 {
           range "1..4096";
         }
       }
 
       list device {
-        tailf:info "Device and interface";
+        tailf:info "L3 switch";
         key name;
 
         leaf name {
@@ -44,11 +44,11 @@ module vlan {
         }
 
         list interface {
-          tailf:info "Interface type and ID";
+          tailf:info "Ethernet interface";
           key "intf-type intf-id";
 
           leaf intf-type {
-            tailf:info "Interface type";
+            tailf:info "Ethernet interface type";
             type enumeration {
               enum Ethernet;
               enum FastEthernet;
@@ -56,7 +56,7 @@ module vlan {
             }
           }
           leaf intf-id {
-            tailf:info "Interface ID";
+            tailf:info "Ethernet interface ID";
             type string;
           }
         }
