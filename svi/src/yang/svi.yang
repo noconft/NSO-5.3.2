@@ -1,0 +1,67 @@
+module svi {
+
+  namespace "http://example.com/svi";
+  prefix svi;
+
+  import ietf-inet-types {
+    prefix inet;
+  }
+  import tailf-common {
+    prefix tailf;
+  }
+  import tailf-ncs {
+    prefix ncs;
+  }
+
+  description "Switch Virtual Interface Service";
+
+  revision 2018-01-01 {
+    description
+      "Initial revision.";
+  }
+
+  augment /ncs:services {
+    list svi {
+      description "This service configures virtual switch interface.";
+      key name;
+
+      leaf name {
+        tailf:info "Service Instance Name";
+        type string;
+      }
+
+      uses ncs:service-data;
+      ncs:servicepoint svi-servicepoint;
+
+
+      list device {
+        tailf:info "L3 switch";
+        key name;
+
+        leaf ip-prefix {
+          tailf:info "Unique IPv4 prefix for VLAN. Device with ip-prefix configured will serve as gateway.";
+          type inet:ipv4-prefix;
+          // Only one device can have ip-prefix configured
+          when "count(../../device[name != current()/../name]/ip-prefix)=0";
+        }
+
+        leaf name {
+          tailf:info "Device name";
+          type leafref {
+            path "/ncs:devices/ncs:device/ncs:name";
+          }
+        }
+
+        list interface {
+          tailf:info "GigabitEthernet interface";
+          key intf-id;
+
+          leaf intf-id {
+            tailf:info "GigabitEthernet interface ID";
+            type string;
+          }
+        }
+      }
+    }
+  }
+}
